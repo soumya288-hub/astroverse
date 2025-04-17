@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <!--mod by Veena Bontu,4/15/25-->
+  <link rel="stylesheet" href="../static/css/chat.css" />
+  <script>
+    function showHome() {
+      hideAll();
+      document.getElementById("HomeDiv").style.display = "block";
+      document.getElementById("HomeMenu").classList.add("active");
+    }
+    function showCompatibility() {
+      hideAll();
+      document.getElementById("CalculatorDiv").style.display = "block";
+      document.getElementById("CalculatorMenu").classList.add("active");
+    }
+    function showGeneralInformation() {
+      hideAll();
+      document.getElementById("GeneralInformationDiv").style.display =
+        "block";
+      document
+        .getElementById("GeneralInformationMenu")
+        .classList.add("active");
+    }
+    function showMonthlyHoroscope() {
+      hideAll();
+      document.getElementById("MonthlyHoroscopeDiv").style.display = "block";
+      document.getElementById("MonthlyHoroscopeMenu").classList.add("active");
+    }
+    function showYearlyCalandar() {
+      hideAll();
+      document.getElementById("YearlyCalandarDiv").style.display = "block";
+      document.getElementById("YearlyCalandarMenu").classList.add("active");
+    }
+    function getYearlyCalandar() {
+      year = "2025";
+      const today = new Date();
+      if (today.getMonth() + 1 == 4) {
+        document.getElementById("aprilDiv").style.display = "block";
+      } else if (today.getMonth() + 1 == 5) {
+        document.getElementById("mayDiv").style.display = "block";
+      } else if (today.getMonth() + 1 == 6) {
+        document.getElementById("juneDiv").style.display = "block";
+      }
+
+
+      monthStr = String(today.getMonth() + 1).padStart(2, "0");
+      days = [3, 6, 8];
+
+
+      days.forEach((day) => {
+        const dayStr = day.toString().padStart(2, "0");
+        document
+          .querySelector(`[calendarDay="${year}-${monthStr}-${dayStr}"]`)
+          .classList.add("highlight_day");
+      });
+    }
+
+
+    function showAboutUs() {
+      hideAll();
+      document.getElementById("AboutUsDiv").style.display = "block";
+      document.getElementById("AboutUsMenu").classList.add("active");
+    }
+    function hideAll() {
+      // mod Veena Bontu,4/15/25
+      document.getElementById("HomeDiv").style.display = "none";
+      document.getElementById("HomeMenu").classList.remove("active");
+      document.getElementById("CalculatorDiv").style.display = "none";
+      document.getElementById("CalculatorMenu").classList.remove("active");
+      document.getElementById("GeneralInformationDiv").style.display = "none";
+      document
+        .getElementById("GeneralInformationMenu")
+        .classList.remove("active");
+      document.getElementById("MonthlyHoroscopeDiv").style.display = "none";
+      document
+        .getElementById("MonthlyHoroscopeMenu")
+        .classList.remove("active");
+      document.getElementById("AboutUsDiv").style.display = "none";
+      document.getElementById("AboutUsMenu").classList.remove("active");
+      document.getElementById("YearlyCalandarDiv").style.display = "none";
+      document
+        .getElementById("YearlyCalandarMenu")
+        .classList.remove("active");
+    }
+    function calculate() {
+      let yourSignVal = document.getElementById("yourSign").value;
+      let partnerSignVal = document.getElementById("partnerSign").value;
+      fetch("compatibility", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          yourSign: yourSignVal,
+          partnerSign: partnerSignVal,
+        }),
+      })
+        .then((response) => response.json())
+        .then((responseData) => {
+          document.getElementById("compatibility_text").innerText =
+            responseData.message;
+          document.getElementById("compatibility_percentage").innerText =
+            responseData.compatibilityPercentage;
+        })
+        .catch((serverError) => alert(serverError));
+    }
+
+
+    function horoscope() {
+      let ElementSignVal = document.getElementById("ElementSign").value;
+      fetch("horoscope", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          sign: ElementSignVal,
+        }),
+      })
+        .then((response) => response.json())
+        .then((responseData) => {
+          document.getElementById("Horoscope_text").innerText =
+            responseData.horoscope;
+          document.getElementById("lucky_colors").innerText =
+            responseData.luckyColors;
+          document.getElementById("lucky_numbers").innerText =
+            responseData.luckyNumbers;
+          document.getElementById("lucky_days").innerText =
+            responseData.luckyDays;
+          document.getElementById("ruling_planet").innerText =
+            responseData.rulingPlanet;
+        })
+        .catch((serverError) => alert(serverError));
+    }
+    //this function sends the user's question to the backend and recieves the approporiate response and displays in the chat window
+    function doChat() {
+      //mod Veena Bontu,4/16/25 with some help of chatGPT
+
+      let userText = document.getElementById("chatUserTextID").value;
+      const body = document.getElementById("chatBody");
+
+      const userDiv = document.createElement("div");
+      userDiv.classList.add("chatMessage", "userMessage");
+      userDiv.textContent = userText;
+      body.appendChild(userDiv);
+
+
+
+      fetch("chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: userText,
+        }),
+      })
+        .then((response) => response.json())
+        .then((responseData) => {
+          document.getElementById("Horoscope_text").innerText =
+            responseData.reply;
+          const botDiv = document.createElement("div");
+          botDiv.classList.add("chatMessage", "botMessage");
+          botDiv.textContent = responseData.reply;
+          body.appendChild(botDiv);
+
+        })
+        .catch((serverError) => alert(serverError));
+      body.scrollTop = body.scrollHeight;
+      document.getElementById("chatUserTextID").value = "";
+    }
+    function displayChatWindow() {
+      const panel = document.getElementById("chatPanel");
+      panel.style.display = panel.style.display === "block" ? "none" : "block";
+    }
+
+  </script>
+
+
+  <title>Astroverse</title>
+
+
+  <style>
+    .calendar-box {
+      background-color: #fefefe;
+      /* crème white background */
+      padding: 20px;
+      margin-top: 10px;
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.15);
+      border: 2px solid #1d2b64;
+      /* rich navy border */
+    }
+
+
+    .calendar-box table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: center;
+    }
+
+
+    .calendar-box th,
+    .calendar-box td {
+      padding: 10px;
+      border: 1px solid #dcdcdc;
+      font-size: 15px;
+      background-color: #ffffff;
+      color: #1d2b64;
+      /* navy text */
+    }
+
+
+    .calendar-box th {
+      background-color: #dbe3f5;
+      /* soft light navy-ish */
+      color: #1a1a40;
+      /* deep navy heading */
+    }
+
+
+    .calendar-box td.highlight_day {
+      background-color: #f8e9c7;
+      /* crème goldish highlight */
+      font-weight: bold;
+      border: 2px solid #e3b34d;
+      color: #000000;
+    }
+
+
+    html,
+    body {
+      height: 100%;
+      overflow: auto;
+      /* optional: keeps scrollbars clean */
+    }
+
+
+    #vanta-bg {
+      width: 100%;
+      height: 100vh;
+      position: fixed;
+      z-index: -1;
+      top: 0;
+      left: 0;
+    }
+
+
+    body {
+      margin: 0;
+      font-family: "Georgia", serif;
+      background: transparent;
+    }
+
+
+    .topnav {
+      overflow: hidden;
+      display: flex;
+      justify-content: space-evenly;
+      align-items: center;
+      padding: 10px 0;
+      background-color: #fefae0;
+    }
+
+
+    .topnav a {
+      float: left;
+      color: #771697;
+      text-align: center;
+      padding: 14px 16px;
+      text-decoration: none;
+      font-size: 17px;
+      display: inline-block;
+    }
+
+
+    .topnav a:hover {
+      background-color: #ddd;
+      color: rgb(89, 41, 234);
+    }
+
+
+    .topnav a.active {
+      background-color: #250a84;
+      color: white;
+    }
+
+
+    button {
+      padding: 20px;
+      color: #7c52ef;
+      display: block;
+      margin: 0 auto;
+      text-decoration: none;
+      font-size: 16px;
+      background: transparent;
+      transition: all 150ms ease-in-out;
+    }
+
+
+    button:hover {
+      color: #fff;
+      background-color: #7c52ef;
+      cursor: pointer;
+    }
+
+
+    h1 {
+      color: #2f0ec3e2;
+      font-size: 50px;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+
+    img:hover {
+      box-shadow: 0 0 2px 1px rgba(85, 7, 157, 0.903);
+    }
+
+
+    .highlight_day {
+      background-color: white;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+
+<body>
+  <div id="particles-js"></div>
+
+
+  <div class="header-container">
+    <div class="header-container">
+      <img src="static/css/_.jpeg" alt="Description of Image" />
+      <h1>AstroVerse</h1>
+    </div>
+    <div class="topnav">
+      <a onclick="showHome()" class="active" id="HomeMenu">Home</a>
+      <a onclick="showCompatibility()" id="CalculatorMenu">Compatibility Calculator</a>
+      <a onclick="showGeneralInformation()" id="GeneralInformationMenu">General Information</a>
+      <a onclick="showMonthlyHoroscope()" id="MonthlyHoroscopeMenu">
+        Monthly Horoscope</a>
+      <a onclick="showYearlyCalandar()" id="YearlyCalandarMenu">
+        Yearly Calandar</a>
+      <a onclick="showAboutUs()" id="AboutUsMenu">About Us</a>
+    </div>
+    <div id="HomeDiv" style="display: block">
+      <div style="
+           display: flex;
+           flex-direction: row;
+           justify-content: center;
+           gap: 40px;
+           padding: 20px;
+         ">
+        <div style="
+             flex: 2;
+             background-color: white;
+             padding: 20px;
+             border-radius: 10px;
+             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+           ">
+          <h2>Welcome to Astroverse!</h2>
+          <hr />
+          <p>
+            We believe that Astrology can be used as a powerful and fun tool
+            for understanding ourselves, others, and the world around us.
+            <br /><br />
+            Have you ever wondered more about your astrology sign or been
+            curious about your compatibility with others? Astroverse has
+            everything you need to dive into the stars — from general sign
+            traits to monthly horoscopes and a cosmic compatibility
+            calculator!
+          </p>
+        </div>
+
+
+        <div style="
+             flex: 1;
+             background-color: #f9f9f9;
+             padding: 20px;
+             border-radius: 10px;
+             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+           ">
+          <h3 style="color: #771697">Calendar</h3>
+          <button onclick="showYearlyCalandar(); getYearlyCalandar();"
+            style="width: 100%; padding: 10px; margin-top: 10px">
+            📅 View Lucky Days
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="AboutUsDiv" style="display: none">
+    <p>
+      Astroverse contains various features that you could learn more from.
+      Make sure to take a look at our compatibility calculator page that is
+      personalized to you and can inform you about what astrology sign you
+      could potentially be compatible with.
+      <br />
+      Additionally, we have a monthly horoscope page that can inform you about
+      what to expect in the upcoming months.
+      <br />
+      <br />
+      Contact Us:
+      <br />
+      Monei Maruping
+      <br />
+      Soumya Sharma
+      <br />
+      Linh Nguyen
+      <br />
+      Veena Bontu
+    </p>
+  </div>
+  <div id="CalculatorDiv" style="display: none">
+    <form>
+      <table border="0">
+        <tr>
+          <th>You</th>
+          <th>Partner</th>
+        </tr>
+        <tr>
+          <td>
+            <table>
+              <tr>
+                <label>Choose your sign:&nbsp;</label>
+                <select id="yourSign" name="options">
+                  <option value="aquarius">Aquarius</option>
+                  <option value="aries">Aries</option>
+                  <option value="cancer">Cancer</option>
+                  <option value="capricorn">Capricorn</option>
+                  <option value="gemini">Gemini</option>
+                  <option value="leo">Leo</option>
+                  <option value="libra">Libra</option>
+                  <option value="pisces">Pisces</option>
+                  <option value="sagittarius">Sagittarius</option>
+                  <option value="scorpio">Scorpio</option>
+                  <option value="taurus">Taurus</option>
+                  <option value="virgo">Virgo</option>
+                </select>
+              </tr>
+            </table>
+          </td>
+          <td>
+            <table>
+              <tr>
+                <label>Choose your sign:&nbsp;</label>
+                <select id="partnerSign" name="options">
+                  <option value="aquarius">Aquarius</option>
+                  <option value="aries">Aries</option>
+                  <option value="cancer">Cancer</option>
+                  <option value="capricorn">Capricorn</option>
+                  <option value="gemini">Gemini</option>
+                  <option value="leo">Leo</option>
+                  <option value="libra">Libra</option>
+                  <option value="pisces">Pisces</option>
+                  <option value="sagittarius">Sagittarius</option>
+                  <option value="scorpio">Scorpio</option>
+                  <option value="taurus">Taurus</option>
+                  <option value="virgo">Virgo</option>
+                </select>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+      <br />
+      <label>Compatability:&nbsp;</label>
+      <label id="compatibility_text"></label>
+      <br />
+      <label>Compatability:&nbsp;</label>
+      <label id="compatibility_percentage"></label>
+      <br />
+      <br />
+      <br />
+      <button type="button" onclick="calculate()">
+        Check Compatibility!
+      </button>
+      <br />
+    </form>
+    <style>
+      form {
+        margin: auto;
+        width: 50%;
+        padding: 10px;
+      }
+    </style>
+  </div>
+
+
+  <div id="GeneralInformationDiv" style="display: none">
+    <style>
+      body {
+        background: transparent;
+        font-family: "Arial", sans-serif;
+        color: #4e4b8f;
+        margin: 0;
+        padding: 0;
+        transition: all 0.5s ease;
+      }
+
+
+      h1 {
+        color: rgb(2, 5, 136);
+        font-size: 40px;
+        text-align: center;
+        margin-top: 50px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+
+      b {
+        font-size: 24px;
+        color: #51219f;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+
+      b:hover {
+        color: #f39c12;
+        transform: scale(1.1);
+        transition: transform 0.3s ease, color 0.3s ease;
+      }
+
+
+      p {
+        font-size: 18px;
+        line-height: 1.6;
+        margin: 15px auto;
+        width: 80%;
+        background: rgba(255, 255, 255, 0.8);
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, background 0.3s ease;
+      }
+
+
+      p:hover {
+        transform: scale(1.05);
+        background: rgba(255, 255, 255, 0.9);
+      }
+
+
+      .sign-container {
+        margin-top: 30px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+
+      .sign {
+        margin: 15px;
+        padding: 20px;
+        border: 2px solid blueviolet;
+        border-radius: 15px;
+        width: 250px;
+        transition: background 0.3s ease;
+      }
+
+
+      .sign:hover {
+        background: #f3e5f5;
+        box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+      }
+
+
+      .sign h3 {
+        font-size: 22px;
+        color: #6a4c9c;
+      }
+
+
+      .sign p {
+        font-size: 16px;
+        color: #333;
+      }
+
+
+      .tooltip {
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+        color: #002d75;
+      }
+
+
+      .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 120px;
+        background-color: black;
+        color: #fff;
+        text-align: center;
+        border-radius: 5px;
+        padding: 5px;
+        position: absolute;
+        z-index: 1;
+        bottom: 125%;
+        left: 50%;
+        margin-left: -60px;
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+
+
+      .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+      }
+
+      #particles-js {
+        position: fixed;
+        width: 100%;
+        height: 100vh;
+        z-index: -1;
+        top: 0;
+        left: 0;
+        background-color: #888ace;
+      }
+    </style>
+
+
+    <h1>Here is some general information about the Astrological signs</h1>
+
+
+    <div class="sign-container">
+      <div class="sign">
+        <h3>
+          <b class="tooltip">Capricorn<span class="tooltiptext">Earth sign</span></b>
+        </h3>
+        <p>
+          Hardworking and diligent, but beware of greed. Fear of failure.
+          Dates: December 22 - January 19
+        </p>
+      </div>
+
+
+      <div class="sign">
+        <h3>
+          <b class="tooltip">Aries<span class="tooltiptext">Fire sign</span></b>
+        </h3>
+        <p>
+          Motivated, confident, but often impatient. Dates: March 21 - April
+          19
+        </p>
+      </div>
+
+
+      <div class="sign">
+        <h3>
+          <b class="tooltip">Leo<span class="tooltiptext">Fire sign</span></b>
+        </h3>
+        <p>
+          Confident, loyal, but can be arrogant. Dates: July 23 - August 22
+        </p>
+      </div>
+
+
+      <div class="sign">
+        <h3>
+          <b class="tooltip">Taurus<span class="tooltiptext">Earth sign</span></b>
+        </h3>
+        <p>Straightforward but very stubborn. Dates: April 20 - May 20</p>
+      </div>
+
+
+      <div class="sign">
+        <h3>
+          <b class="tooltip">Virgo<span class="tooltiptext">Earth sign</span></b>
+        </h3>
+        <p>
+          Loving but can be overly critical. Dates: August 23 - September 22
+        </p>
+      </div>
+
+
+      <div class="sign">
+        <h3>
+          <b class="tooltip">Pisces<span class="tooltiptext">Water sign</span></b>
+        </h3>
+        <p>Creative but easily manipulated. Dates: February 19 - March 20</p>
+      </div>
+
+
+      <div class="sign">
+        <h3>
+          <b class="tooltip">Gemini<span class="tooltiptext">Air sign</span></b>
+        </h3>
+        <p>Curious but indecisive. Dates: May 21 - June 21</p>
+      </div>
+
+
+      <div class="sign">
+        <h3>
+          <b class="tooltip">Libra<span class="tooltiptext">Air sign</span></b>
+        </h3>
+        <p>
+          Honest but avoids confrontation. Dates: September 23 - October 22
+        </p>
+      </div>
+
+
+      <div class="sign">
+        <h3>
+          <b class="tooltip">Scorpio<span class="tooltiptext">Water sign</span></b>
+        </h3>
+        <p>Independent but greedy. Dates: October 23 - November 21</p>
+      </div>
+
+
+      <div class="sign">
+        <h3>
+          <b class="tooltip">Cancer<span class="tooltiptext">Water sign</span></b>
+        </h3>
+        <p>Emotional but insecure. Dates: June 22 - July 22</p>
+      </div>
+
+
+      <div class="sign">
+        <h3>
+          <b class="tooltip">Sagittarius<span class="tooltiptext">Fire sign</span></b>
+        </h3>
+        <p>Adventurous but impatient. Dates: November 22 - December 21</p>
+      </div>
+
+
+      <div class="sign">
+        <h3>
+          <b class="tooltip">Aquarius<span class="tooltiptext">Air sign</span></b>
+        </h3>
+        <p>Innovative but stubborn. Dates:January 20 - February 18</p>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="MonthlyHoroscopeDiv" style="display: none">
+    <form>
+      <p>Enter your astrology sign</p>
+      <table>
+        <tr>
+          <label>Choose your sign:&nbsp;</label>
+          <select id="ElementSign" name="options">
+            <option value="aquarius">Aquarius</option>
+            <option value="aries">Aries</option>
+            <option value="cancer">Cancer</option>
+            <option value="capricorn">Capricorn</option>
+            <option value="gemini">Gemini</option>
+            <option value="leo">Leo</option>
+            <option value="libra">Libra</option>
+            <option value="pisces">Pisces</option>
+            <option value="sagittarius">Sagittarius</option>
+            <option value="scorpio">Scorpio</option>
+            <option value="taurus">Taurus</option>
+            <option value="virgo">Virgo</option>
+          </select>
+        </tr>
+      </table>
+      <br />
+      <label>Monthly Horoscope:&nbsp;</label>
+      <label id="Horoscope_text"></label>
+      <br />
+      <label>Lucky Colors:&nbsp;</label>
+      <label id="lucky_colors"></label>
+      <br />
+      <label>Lucky Numbers:&nbsp;</label>
+      <label id="lucky_numbers"></label>
+      <br />
+      <label>Lucky Days:&nbsp;</label>
+      <label id="lucky_days"></label>
+      <br />
+      <label>Ruling Planet:&nbsp;</label>
+      <label id="ruling_planet"></label>
+      <br />
+      <br />
+      <br />
+      <br />
+      <button type="button" onclick="horoscope()">
+        Check Your Horoscope!
+      </button>
+      <br />
+    </form>
+  </div>
+
+
+  <div id="YearlyCalandarDiv" style="display: none">
+    <form>
+      <p>Enter your Astrology Sign!</p>
+      <table>
+        <tr>
+          <label>Choose a sign:&nbsp;</label>
+          <select id="ElementMonth" name="options">
+            <option value="aquarius">Aquarius</option>
+            <option value="aries">Aries</option>
+            <option value="cancer">Cancer</option>
+            <option value="capricorn">Capricorn</option>
+            <option value="gemini">Gemini</option>
+            <option value="leo">Leo</option>
+            <option value="libra">Libra</option>
+            <option value="pisces">Pisces</option>
+            <option value="sagittarius">Sagittarius</option>
+            <option value="scorpio">Scorpio</option>
+            <option value="taurus">Taurus</option>
+            <option value="virgo">Virgo</option>
+          </select>
+        </tr>
+      </table>
+      <br />
+
+
+      <div id="aprilDiv" style="display: none">
+        <h2>April 2025</h2>
+        <div class="calendar-box">
+          <table>
+            <thead>
+              <tr>
+                <th>Sun</th>
+                <th>Mon</th>
+                <th>Tue</th>
+                <th>Wed</th>
+                <th>Thu</th>
+                <th>Fri</th>
+                <th>Sat</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td></td>
+                <td></td>
+                <td calendarDay="2025-04-01">1</td>
+                <td calendarDay="2025-04-02">2</td>
+                <td calendarDay="2025-04-03">3</td>
+                <td calendarDay="2025-04-04">4</td>
+                <td calendarDay="2025-04-05">5</td>
+              </tr>
+              <tr>
+                <td calendarDay="2025-04-06">6</td>
+                <td calendarDay="2025-04-07">7</td>
+                <td calendarDay="2025-04-08">8</td>
+                <td calendarDay="2025-04-09">9</td>
+                <td calendarDay="2025-04-10">10</td>
+                <td calendarDay="2025-04-11">11</td>
+                <td calendarDay="2025-04-12">12</td>
+              </tr>
+              <tr>
+                <td calendarDay="2025-04-13">13</td>
+                <td calendarDay="2025-04-14">14</td>
+                <td calendarDay="2025-04-15">15</td>
+                <td calendarDay="2025-04-16">16</td>
+                <td calendarDay="2025-04-17">17</td>
+                <td calendarDay="2025-04-18">18</td>
+                <td calendarDay="2025-04-19">19</td>
+              </tr>
+              <tr>
+                <td calendarDay="2025-04-20">20</td>
+                <td calendarDay="2025-04-21">21</td>
+                <td calendarDay="2025-04-22">22</td>
+                <td calendarDay="2025-04-23">23</td>
+                <td calendarDay="2025-04-24">24</td>
+                <td calendarDay="2025-04-25">25</td>
+                <td calendarDay="2025-04-26">26</td>
+              </tr>
+              <tr>
+                <td calendarDay="2025-04-27">27</td>
+                <td calendarDay="2025-04-28">28</td>
+                <td calendarDay="2025-04-29">29</td>
+                <td calendarDay="2025-04-30">30</td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+
+      <div id="mayDiv" style="display: none">
+        <h2>May 2025</h2>
+        <div class="calendar-box">
+          <table>
+            <thead>
+              <tr>
+                <th>Sun</th>
+                <th>Mon</th>
+                <th>Tue</th>
+                <th>Wed</th>
+                <th>Thu</th>
+                <th>Fri</th>
+                <th>Sat</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td calendarDay="2025-05-01">1</td>
+                <td calendarDay="2025-05-02">2</td>
+                <td calendarDay="2025-05-03">3</td>
+              </tr>
+              <tr>
+                <td calendarDay="2025-05-04">4</td>
+                <td calendarDay="2025-05-05">5</td>
+                <td calendarDay="2025-05-06">6</td>
+                <td calendarDay="2025-05-07">7</td>
+                <td calendarDay="2025-05-08">8</td>
+                <td calendarDay="2025-05-09">9</td>
+                <td calendarDay="2025-05-10">10</td>
+              </tr>
+              <tr>
+                <td calendarDay="2025-05-11">11</td>
+                <td calendarDay="2025-05-12">12</td>
+                <td calendarDay="2025-05-13">13</td>
+                <td calendarDay="2025-05-14">14</td>
+                <td calendarDay="2025-05-15">15</td>
+                <td calendarDay="2025-05-16">16</td>
+                <td calendarDay="2025-05-17">17</td>
+              </tr>
+              <tr>
+                <td calendarDay="2025-05-18">18</td>
+                <td calendarDay="2025-05-19">19</td>
+                <td calendarDay="2025-05-20">20</td>
+                <td calendarDay="2025-05-21">21</td>
+                <td calendarDay="2025-05-22">22</td>
+                <td calendarDay="2025-05-23">23</td>
+                <td calendarDay="2025-05-24">24</td>
+              </tr>
+              <tr>
+                <td calendarDay="2025-05-25">25</td>
+                <td calendarDay="2025-05-26">26</td>
+                <td calendarDay="2025-05-27">27</td>
+                <td calendarDay="2025-05-28">28</td>
+                <td calendarDay="2025-05-29">29</td>
+                <td calendarDay="2025-05-30">30</td>
+                <td calendarDay="2025-05-31">31</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div id="juneDiv" style="display: none">
+        <h2>June 2025</h2>
+        <div class="calendar-box">
+          <table>
+            <thead>
+              <tr>
+                <th>Sun</th>
+                <th>Mon</th>
+                <th>Tue</th>
+                <th>Wed</th>
+                <th>Thu</th>
+                <th>Fri</th>
+                <th>Sat</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td calendarDay="2025-06-01">1</td>
+                <td calendarDay="2025-06-02">2</td>
+                <td calendarDay="2025-06-03">3</td>
+                <td calendarDay="2025-06-04">4</td>
+                <td calendarDay="2025-06-05">5</td>
+                <td calendarDay="2025-06-06">6</td>
+                <td calendarDay="2025-06-07">7</td>
+              </tr>
+              <tr>
+                <td calendarDay="2025-06-08">8</td>
+                <td calendarDay="2025-06-09">9</td>
+                <td calendarDay="2025-06-10">10</td>
+                <td calendarDay="2025-06-11">11</td>
+                <td calendarDay="2025-06-12">12</td>
+                <td calendarDay="2025-06-13">13</td>
+                <td calendarDay="2025-06-14">14</td>
+              </tr>
+              <tr>
+                <td calendarDay="2025-06-15">15</td>
+                <td calendarDay="2025-06-16">16</td>
+                <td calendarDay="2025-06-17">17</td>
+                <td calendarDay="2025-06-18">18</td>
+                <td calendarDay="2025-06-19">19</td>
+                <td calendarDay="2025-06-20">20</td>
+                <td calendarDay="2025-06-21">21</td>
+              </tr>
+              <tr>
+                <td calendarDay="2025-06-22">22</td>
+                <td calendarDay="2025-06-23">23</td>
+                <td calendarDay="2025-06-24">24</td>
+                <td calendarDay="2025-06-25">25</td>
+                <td calendarDay="2025-06-26">26</td>
+                <td calendarDay="2025-06-27">27</td>
+                <td calendarDay="2025-06-28">28</td>
+              </tr>
+              <tr>
+                <td calendarDay="2025-06-29">29</td>
+                <td calendarDay="2025-06-30">30</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+
+      <button type="button" onclick="getYearlyCalandar()">
+        Check Your Lucky Days!
+      </button>
+      <br />
+    </form>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+
+
+  <script>
+    particlesJS("particles-js", {
+      particles: {
+        number: { value: 100 },
+        color: { value: "#ffffff" },
+        shape: {
+          type: "polygon",
+          polygon: {
+            nb_sides: 5, // makes them more "star-like"
+          },
+        },
+        opacity: {
+          value: 0.9,
+          random: true,
+          anim: {
+            enable: true,
+            speed: 1,
+            opacity_min: 0.3,
+            sync: false,
+          },
+        },
+        size: {
+          value: 3,
+          random: true,
+          anim: {
+            enable: true,
+            speed: 2,
+            size_min: 0.5,
+            sync: false,
+          },
+        },
+        move: {
+          enable: true,
+          speed: 0.3,
+          direction: "none",
+          out_mode: "out",
+        },
+      },
+      interactivity: {
+        events: {
+          onhover: { enable: true, mode: "repulse" },
+          onclick: { enable: true, mode: "push" },
+        },
+        modes: {
+          repulse: { distance: 80 },
+          push: { particles_nb: 4 },
+        },
+      },
+      retina_detect: true,
+    });
+  </script>
+  <!--mod by Veena Bontu,4/15/25-->
+  <button class="displayChatCss" onclick="displayChatWindow()">Chat...</button>
+
+
+  <div id="chatPanel" class="chatDivCss" style="display: none;">
+    <div class="chatHeaderCss">
+      <div class="chatTitle">Chatbot</div>
+      <div class="chatCloseWrapper">
+        <button class="chatCloseButtonCss" onclick="displayChatWindow()">x</button>
+      </div>
+    </div>
+    <div class="chatBodyCss" id="chatBody">
+      <div class="chatConversationCss">
+        <span class="chatConversationWorkingCss">Welcome! What can I help you with?</span>
+      </div>
+    </div>
+    <div class="chatUserTextCss">
+      <input type="text" id="chatUserTextID" placeholder="Enter your question" />
+      <button onclick="doChat()">Enter</button>
+    </div>
+  </div>
+
+
+
+
+</body>
+
+</html>
